@@ -3,20 +3,38 @@ const gallery = document.getElementById('gallery');
 const body = document.querySelector('body');
 
 
+/**
+ * This gets the response from the randomuser api and converts to json
+ * @param {url} url 
+ */
 async function getJSON(url) {
   try {
     const response = await fetch(url);
     return await response.json();
   } catch(err) {
+    gallery.insertAdjacentHTML('beforeend', `
+    <h2>WARNING!!!! WARNING!!!!</h2>
+    <h3>Complete core meltdown!!!!!</h3>
+    <h4>Just kidding...something did go wrong but maybe just try a refresh.</h4>
+    `);
     throw err;
   }
 }
 
+/**
+ * gets json from getJSON and returns the results array with the people requested
+ * @param {url} url 
+ */
 async function getPeople(url) {
   const peopleJSON = await getJSON(url);
   return results = await peopleJSON.results;
 }
 
+/**
+ * Gets the results from the request and creates the card for each individual.
+ * Returns data when finished with map.
+ * @param {data} data 
+ */
 function generateHTML(data) {
   data.map(person => {
     gallery.insertAdjacentHTML('beforeend', `
@@ -35,16 +53,29 @@ function generateHTML(data) {
   return data;
 }
 
+/**
+ * Formats given phonenumber to proper format
+ * @param {telephoneNumber} text 
+ */
 function formatTelephone(text) {
   const regex = /^\D*(\d{3})\D*(\d{3})\D*(\d{4})\D*$/;
   return text.replace(regex, '($1) $2-$3');
 }
 
+/**
+ * formats given DOB to proper format 
+ * @param {dateOfBirth} text 
+ */
 function formatDOB(text) {
   const regex = /^(\d{4})\D*(\d{2})\D*(\d{2}).*$/;
   return text.replace(regex, '$2/$3/$1');
 }
 
+/**
+ * Only one person is passed in and a modal is created for them. Also adds functionality
+ * to the close button so control is given back to site.
+ * @param {data} data 
+ */
 function generateModal(data) {
   const modalContainer = document.createElement('div');
   modalContainer.classList.add('modal-container');
@@ -64,7 +95,7 @@ function generateModal(data) {
       </div>
     </div>
   `);
-  
+
   const modal = document.querySelector('.modal-container');
   const btn = document.querySelector('button');
   btn.addEventListener('click', (e) => {
@@ -72,6 +103,10 @@ function generateModal(data) {
   })
 }
 
+/**
+ * This goes through the various functions required to build site. It waits on a response
+ * then creates an event listener on each card on the site.
+ */
 getPeople(url)
   .then(generateHTML)
   .then((data) => {
